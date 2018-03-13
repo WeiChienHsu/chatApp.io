@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/WeiChienHsu/chatApp.io#readme",
   "dependencies": {
-    "mongodb": "^3.0.4"
+    "mongodb": "^3.0.4",
+    "socket.io": "^2.0.4"
   }
 }
