@@ -1,5 +1,22 @@
 # Chat App with socket.io and MongoDB
 
+Simple chat app that uses MongoDB and Socket.io
+
+### Version
+1.0.0
+
+## Install Dependencies
+```bash
+npm install 
+```
+
+## Run Server
+```bash
+npm start
+```
+
+## Run App
+Open inedx.html
 
 
 ***
@@ -26,6 +43,22 @@ MongoClient.connect(url, function(err, client) {
 
   client.close();
 });
+```
+
+## Fix : MongoDB not load Bug Fixed
+```js
+MongoClient.connect('mongodb://localhost:27017', function(err, database){
+    if(err){
+      throw err;
+    }
+    
+    console.log("MongoDB is connected!!")
+
+    const myAwesomeDB = database.db('mongochat')
+
+     io.on('connection', (socket) =>{
+
+       let chat = myAwesomeDB.collection('chat');
 ```
 
 ## Socket.io Connectoin - Using with Node http server
