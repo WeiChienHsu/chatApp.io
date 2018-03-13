@@ -2,23 +2,19 @@ const MongoClient = require('mongodb').MongoClient;
 
 const io = require('socket.io').listen(4000).sockets;
 
-// Connection URL
-const URL = 'mongodb://localhost:27017';
-
-// Database Name
-const dbName = 'chatapp';
-
 // Use connect method to connect to the server
-MongoClient.connect(URL, function(err, db) {
+MongoClient.connect('mongodb://localhost:27017', function(err, database){
     if(err){
       throw err;
     }
     
     console.log("MongoDB is connected!!")
 
+    const myAwesomeDB = database.db('mongochat')
+
      io.on('connection', (socket) =>{
 
-       let chat = db.collection('chat');
+       let chat = myAwesomeDB.collection('chat');
 
        // Create Function to send status to client
        // server -> Html (use socket.emit)
@@ -28,14 +24,14 @@ MongoClient.connect(URL, function(err, db) {
 
        // Get chats from mongo collection
        // chat is a mongo collection
-       chat.find().limit(100).sort({_id:1}.toArray((err, res) => {
+       chat.find().limit(100).sort({_id:1}).toArray((err, res) => {
           if(err){
             throw err;
           }
 
           // Emit the messages to client
           socket.emit('output', res);
-       }));
+       });
 
        //-- Client to Server : socket.on
 
