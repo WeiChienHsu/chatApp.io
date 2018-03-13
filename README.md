@@ -1,5 +1,10 @@
 # Chat App with socket.io and MongoDB
 
+
+
+***
+# Server Client
+
 ## MongoDB native node driver
 
 ```js
@@ -113,3 +118,7 @@ function onConnect(socket){
 
 };
 ```
+
+***
+
+# Client Side
