@@ -2,9 +2,6 @@
 
 Simple chat app that uses MongoDB and Socket.io
 
-### Version
-1.0.0
-
 ## Install Dependencies
 ```bash
 npm install 
@@ -20,6 +17,13 @@ Open inedx.html
 
 
 ***
+# Design Pattern
+- Add "Message" with "Username"
+- Save Message into Database
+- Other User can see the change at the same time
+- Clear Message in Database
+
+
 # Server Client
 
 ## MongoDB native node driver
@@ -155,3 +159,96 @@ function onConnect(socket){
 ***
 
 # Client Side
+- Used one element variable and then you don't need to return document.getElementById everytime you new a element
+
+```js
+<script>
+    (function(){
+        var element = function(id){
+          return document.getElementById(id);
+        }
+    )()
+</script>
+```
+
+- Get All Elements we need to use in frontend and backend(status\messages\username\textarea\clear)
+```js
+          var status = element('status');
+          var messages = element('messages');
+          var username = element('username');
+          var textarea = element('textarea');
+          var clearBtn = element('clear');
+```
+
+- Set a default status and create a setStatus function to set new sataus when server side emit status to client
+- But we just need the status to exist for couple seconds, so if status didn't equal to default value we would like to clear it in 4m.
+
+```js
+  var statusDefault = status.textContent;
+  var setStatus = function(s) {
+
+    status.textContent = s;
+    if(s != statusDefault){
+      var delay = setTimeout(function(){
+        setStatus(statusDefault);
+      }, 4000);
+    }
+  }
+```
+
+- Connect to socket.io and Check for the connection
+```js
+ var socket = io.connect('http://127.0.0.1:4000');
+
+```
+
+- Take res from server and put it into textarea
+- Both Frontend and Backend need to check if they both got a data
+```js
+socket.on('output',(data) => {
+    if(data.length){
+      for(var x = 0; x < data.length; x++) {
+          var message = document.createElement('div');
+          message.setAttribute('class', 'chat-message');
+          message.textContent = data[x].name+": " + data[x].message;
+          messages.appendChild(message);
+          messages.insertBefore(message,
+          messages.firstChild);
+```
+
+- Handle Input message
+```js
+  textarea.addEventListener('keydown', (event) => {
+    if(event.which === 13 && event.shiftKey == false) {
+        socket.emit('input', {
+          name: username.value,
+          message: textarea.value
+        });
+        
+        event.preventDefault();
+    }
+  });
+```
+
+- Handle Status sent from backend(An Object or Error Message)
+```js
+socket.on('status',(data) => {
+  setStatus((typeof data === 'object')? data.message : data);
+  
+  if(data.clear) {
+    textarea.val = '';
+  }
+});
+```
+
+- Clear the all message
+```js
+  socket.on('cleared', () => {
+    messages.textContent = '';
+  });
+
+```
+
+***
+
+Resources from (Traversy Media)[https://www.youtube.com/watch?v=8Y6mWhcdSUM]

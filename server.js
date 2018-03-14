@@ -3,7 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 const io = require('socket.io').listen(4000).sockets;
 
 // Use connect method to connect to the server
-MongoClient.connect('mongodb://localhost:27017', function(err, database){
+MongoClient.connect('mongodb://127.0.0.1/mongochat', function(err, database){
     if(err){
       throw err;
     }
@@ -14,7 +14,7 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
 
      io.on('connection', (socket) =>{
 
-       let chat = myAwesomeDB.collection('chat');
+       let chat = myAwesomeDB.collection('chats');
 
        // Create Function to send status to client
        // server -> Html (use socket.emit)
@@ -61,8 +61,8 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
           // Remove all chats from collection
           chat.remove({}, () => {
             // Emit to Client that everything is cleared
-            socket.emit('cleared!');
-          })
-       })
+            socket.emit('cleared');
+          });
+       });
      });
   });

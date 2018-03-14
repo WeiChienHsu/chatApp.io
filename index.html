@@ -28,8 +28,6 @@
 
             <div class="card">
               <div class="card-block" id = "messages">
-
-
               </div>
             </div>
             <br>
@@ -73,7 +71,54 @@
 
           // Check for connection 
           if(socket !== undefined) {
-            console.log("Client has been connected with Socket..")
+            console.log("Client has been connected with Socket..");
+            
+            // Handle 'outputs'
+            socket.on('output',(data) => {
+                if(data.length){
+                  for(var x = 0; x < data.length; x++) {
+                      var message = document.createElement('div');
+                      message.setAttribute('class', 'chat-message');
+                      message.textContent = data[x].name+": " + data[x].message;
+                      messages.appendChild(message);
+                      messages.insertBefore(message,
+                      messages.firstChild);
+                  }
+                }
+            });
+            // Handle 'input'
+            textarea.addEventListener('keydown', (event) => {
+              if(event.which === 13 && event.shiftKey == false) {
+                  socket.emit('input', {
+                    name: username.value,
+                    message: textarea.value
+                  });
+                  
+                  event.preventDefault();
+              }
+            });
+
+
+            // Get 'status' from Server
+            socket.on('status',(data) => {
+              // Get Message Status
+              setStatus((typeof data === 'object')? data.message : data);
+              
+              if(data.clear) {
+                textarea.value = '';
+              }
+            });
+
+            // Handle Clear Button
+            clearBtn.addEventListener('click', () => {
+                console.log("clear click!")
+                socket.emit('clear');
+            });
+
+            // Clear Message
+            socket.on('cleared', () => {
+              messages.textContent = '';
+            });
           }
 
       })();
