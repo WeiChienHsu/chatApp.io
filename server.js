@@ -39,12 +39,21 @@ MongoClient.connect('mongodb://127.0.0.1/mongochat', function(err, database){
        socket.on('input', (data) => {
          let name = data.name;
          let message = data.message;
-          
+         
          // Check for name and message
 
           if(name == '' || message == '') {
-            sendStatus("Please enter a name and message")
+            sendStatus("Please enter da name and message")
           } else {
+            
+            chat.count((err, nbDocs) => {
+              if(nbDocs > 7) {
+                chat.remove({}, () => {
+                  io.emit('cleared');
+                });
+              }
+            })
+            
             // Insert message into MongoDB
             chat.insert({name: name, message: message}, () =>{
               io.emit('output', [data]); // io : talk to group of sockets.
@@ -61,7 +70,7 @@ MongoClient.connect('mongodb://127.0.0.1/mongochat', function(err, database){
           // Remove all chats from collection
           chat.remove({}, () => {
             // Emit to Client that everything is cleared
-            socket.emit('cleared');
+            io.emit('cleared');
           });
        });
      });

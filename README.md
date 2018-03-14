@@ -2,6 +2,8 @@
 
 Simple chat app that uses MongoDB and Socket.io
 
+![Demo](./demo2.gif)
+
 ## Install Dependencies
 ```bash
 npm install 
